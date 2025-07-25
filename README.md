@@ -8,7 +8,7 @@
 ## 🚀 Overview
 
 Policies have consequences — BizRipple captures them.  
-Whether it's a minimum wage hike or zoning law revision, this tool helps model how such changes reverberate across industries like:
+Whether it's a minimum wage hike or zoning law revision, this tool helps model how such changes reverberate across industries like
 
 - Restaurants 🍽️  
 - Retail 🛍️  
