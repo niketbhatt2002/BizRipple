@@ -89,8 +89,9 @@ Copy
 Edit
 npm run dev
 Visit: http://localhost:5173
+```
 
-💡 Use Case Example
+## 💡 Use Case Example
 Scenario: Minimum wage increases by 15% in a metropolitan area.
 
 BizRipple shows:
@@ -103,13 +104,15 @@ Customer flow dip in budget retailers
 
 Rent pressure trends for pharmacies
 
-🌟 Contributors
+---
+## 🌟 Contributors
 Name	Role	Contribution
 Niket Bhatt (niketbhatt2002)	Data Curator & Insight Visualist	Led data collection, preprocessing, and analytics visualization.
 Krunal Thakar	Application Engineer	Crafted core application logic and UI components.
 Dajinder Singh (Dajinder)	Solution Architect & Backend Strategist	Designed system architecture and backend API logic.
 Urvi Shah	Figma Designer & UI Prototype Designer	Created the UI/UX designs and interactive prototypes using Figma.
 
+--- 
 📌 Future Enhancements
 Dynamic simulation controls
 
