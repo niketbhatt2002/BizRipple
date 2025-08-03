@@ -1,3 +1,7 @@
+[![Niket Bhatt's GitHub Profile](https://github.com/niketbhatt2002.png?size=100)](https://github.com/niketbhatt2002)
+
+# 💼 BizRipple
+
 # 💼 BizRipple
 
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
