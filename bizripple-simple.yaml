@@ -1,10 +1,49 @@
+# This manifest defines a simple Pod to run your BizRipple application.
+# The image is currently a placeholder (nginx) and should be updated with your actual app image once ready.
+
 apiVersion: v1
 kind: Pod
 metadata:
   name: bizripple-pod
+  labels:
+    app: bizripple
 spec:
   containers:
   - name: bizripple-container
-    image: nginx # placeholder image, replace later with your app image
+    image: nginx # Replace with your Docker image (e.g., yourdockerhub/bizripple:latest)
     ports:
     - containerPort: 80
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+---
+# Service to expose the pod internally within the Kubernetes cluster.
+apiVersion: v1
+kind: Service
+metadata:
+  name: bizripple-service
+spec:
+  selector:
+    app: bizripple
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: ClusterIP
