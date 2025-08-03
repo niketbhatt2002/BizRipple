@@ -1,6 +1,4 @@
-[![Niket Bhatt's GitHub Profile](https://github.com/niketbhatt2002.png?size=100)](https://github.com/niketbhatt2002)
 
-# 💼 BizRipple
 
 # 💼 BizRipple
 
