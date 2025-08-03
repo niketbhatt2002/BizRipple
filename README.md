@@ -107,7 +107,7 @@ Rent pressure trends for pharmacies
 ---
 ## 🌟 Contributors
 
-## | Name	                         |   Role	                                    | Contribution                                                     |
+   | Name	                         |   Role	                                    | Contribution                                                     |
    |-------------------------------|--------------------------------------------|------------------------------------------------------------------|
    | Niket Bhatt (niketbhatt2002)  | Data Curator & Insight Visualist	          | Led data collection, preprocessing, and analytics visualization. |
    | Krunal Thakar	Application    | Engineer	                                  | Crafted core application logic and UI components.                |
