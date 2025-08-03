@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bizripple-pod
+spec:
+  containers:
+  - name: bizripple-container
+    image: nginx # placeholder image, replace later with your app image
+    ports:
+    - containerPort: 80
