@@ -13,6 +13,9 @@ import sys
 import yaml
 from github import Github, GithubException
 
+# Hard cap on the number of ops-note files created in a single run.
+MAX_OPS_NOTES = 50
+
 
 # ---------------------------------------------------------------------------
 # Config / auth
@@ -27,7 +30,7 @@ def load_config(path: str = "bot-config.yml") -> dict:
 
 
 def utc_today() -> datetime.date:
-    return datetime.datetime.utcnow().date()
+    return datetime.datetime.now(datetime.timezone.utc).date()
 
 
 # ---------------------------------------------------------------------------
@@ -68,25 +71,61 @@ def apply_maintenance_changes(
     date_str = today.isoformat()
     committed = 0
 
-    # 1) Daily maintenance log
-    if ensure_file(
-        repo,
-        "docs/MAINTENANCE_LOG.md",
-        f"# Maintenance Log\n\n## {date_str}\n- Automated repo maintenance run.\n",
-        f"docs: add maintenance log for {date_str}",
-        branch,
-    ):
-        committed += 1
+    # 1) Daily maintenance log — append today's entry if not already present
+    log_path = "docs/MAINTENANCE_LOG.md"
+    log_entry = f"## {date_str}\n- Automated repo maintenance run.\n"
+    try:
+        existing_log = repo.get_contents(log_path, ref=branch)
+        current_log = existing_log.decoded_content.decode("utf-8")
+        if date_str not in current_log:
+            new_log = current_log.rstrip("\n") + f"\n\n{log_entry}"
+            repo.update_file(
+                log_path,
+                f"docs: add maintenance log for {date_str}",
+                new_log,
+                existing_log.sha,
+                branch=branch,
+            )
+            committed += 1
+    except GithubException as exc:
+        if exc.status == 404:
+            repo.create_file(
+                log_path,
+                f"docs: add maintenance log for {date_str}",
+                f"# Maintenance Log\n\n{log_entry}",
+                branch=branch,
+            )
+            committed += 1
+        else:
+            raise
 
-    # 2) Changelog entry
-    if ensure_file(
-        repo,
-        "CHANGELOG.md",
-        f"# Changelog\n\n## {date_str}\n- Maintenance: docs/meta/housekeeping updates.\n",
-        f"chore(changelog): add entry for {date_str}",
-        branch,
-    ):
-        committed += 1
+    # 2) Changelog — append today's entry if not already present
+    changelog_path = "CHANGELOG.md"
+    cl_entry = f"## {date_str}\n- Maintenance: docs/meta/housekeeping updates.\n"
+    try:
+        existing_cl = repo.get_contents(changelog_path, ref=branch)
+        current_cl = existing_cl.decoded_content.decode("utf-8")
+        if date_str not in current_cl:
+            new_cl = current_cl.rstrip("\n") + f"\n\n{cl_entry}"
+            repo.update_file(
+                changelog_path,
+                f"chore(changelog): add entry for {date_str}",
+                new_cl,
+                existing_cl.sha,
+                branch=branch,
+            )
+            committed += 1
+    except GithubException as exc:
+        if exc.status == 404:
+            repo.create_file(
+                changelog_path,
+                f"chore(changelog): add entry for {date_str}",
+                f"# Changelog\n\n{cl_entry}",
+                branch=branch,
+            )
+            committed += 1
+        else:
+            raise
 
     # 3) CODEOWNERS baseline
     if ensure_file(
@@ -132,7 +171,7 @@ def apply_maintenance_changes(
         ):
             committed += 1
         note_index += 1
-        if note_index > 50:  # hard safety cap — should never be reached
+        if note_index > MAX_OPS_NOTES:  # hard safety cap — should never be reached
             break
 
     return committed
