@@ -40,8 +40,17 @@ def utc_today() -> datetime.date:
 def ensure_file(repo, path: str, content: str, message: str, branch: str) -> bool:
     """
     Create or update *path* in *branch* with *content*.
-    Returns True if a write was performed (i.e. the file was absent or
-    different), False if the existing content was identical (no-op skipped).
+
+    Args:
+        repo: PyGithub ``Repository`` object for the target repo.
+        path: File path relative to the repo root (e.g. ``docs/README.md``).
+        content: Full desired file content as a UTF-8 string.
+        message: Commit message to use when writing the file.
+        branch: Branch name to write to.
+
+    Returns:
+        True if a write was performed (file absent or content differed),
+        False if the existing content was already identical (no-op skipped).
     """
     try:
         existing = repo.get_contents(path, ref=branch)
@@ -66,7 +75,16 @@ def apply_maintenance_changes(
 ) -> int:
     """
     Apply at least *min_commits* real, small maintenance edits to *branch*.
-    Returns the number of commits actually made.
+
+    Args:
+        repo: PyGithub ``Repository`` object for the target repo.
+        branch: Branch name to commit changes into.
+        today: The current UTC date (used to stamp log/changelog entries).
+        min_commits: Minimum number of file writes required before a PR is
+            considered ready.
+
+    Returns:
+        The number of commits actually made during this run.
     """
     date_str = today.isoformat()
     committed = 0
@@ -182,7 +200,14 @@ def apply_maintenance_changes(
 # ---------------------------------------------------------------------------
 
 def open_pr_exists(repo, branch_name: str, base_branch: str) -> bool:
-    """Return True if an open PR already targets *branch_name* → *base_branch*."""
+    """
+    Return True if an open PR already targets *branch_name* → *base_branch*.
+
+    Args:
+        repo: PyGithub ``Repository`` object for the target repo.
+        branch_name: Head branch of the PR to look for (without owner prefix).
+        base_branch: Base branch the PR would merge into (e.g. ``main``).
+    """
     owner = repo.owner.login
     head_ref = f"{owner}:{branch_name}"
     pulls = repo.get_pulls(state="open", head=head_ref, base=base_branch)
@@ -194,6 +219,18 @@ def open_pr_exists(repo, branch_name: str, base_branch: str) -> bool:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    """
+    Entry point for the daily maintenance bot.
+
+    Workflow:
+    1. Validate ``GH_TOKEN`` and load ``bot-config.yml``.
+    2. Determine today's target repo via deterministic ordinal-based rotation.
+    3. Ensure the ``bot/maintenance-YYYY-MM-DD`` branch exists in that repo.
+    4. Skip if an open PR for that branch already exists (duplicate guard).
+    5. Apply ≥ ``min_commits_per_pr`` real maintenance edits.
+    6. Open one PR; enforce the ``max_prs_per_day_total`` hard limit.
+    7. Print a summary and exit cleanly.
+    """
     token = os.getenv("GH_TOKEN")
     if not token:
         print("ERROR: GH_TOKEN environment variable is required.", file=sys.stderr)
