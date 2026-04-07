@@ -1,0 +1,15 @@
+owner: niketbhatt2002
+default_branch: main
+max_prs_per_day_total: 1
+min_commits_per_pr: 9
+
+target_repos:
+  - BizRipple
+  - Credify
+  - mina-crm-ai
+
+change_types:
+  - docs
+  - changelog
+  - github_meta
+  - housekeeping
